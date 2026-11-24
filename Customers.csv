@@ -1,0 +1,18 @@
+CustomerID,CustomerName,Email,Phone,City,State,Country,CustomerSegment,AssignedStoreID
+CUST-101,Ajay,ajay.joshi@example.com,+91 98201 11223,Mumbai,Maharashtra,India,Consumer,STR-004
+CUST-102,Anitha,anitha.raman@example.com,+91 98401 22334,Chennai,Tamil Nadu,India,Corporate,STR-001
+CUST-103,Arun,arun.prasath@example.com,+91 98801 33445,Bengaluru,Karnataka,India,Consumer,STR-002
+CUST-104,Deepa,deepa.s@example.com,+91 98802 44556,Bengaluru,Karnataka,India,Home Office,STR-002
+CUST-105,Divya,divya.sharma@example.com,+91 98490 55667,Hyderabad,Telangana,India,Corporate,STR-003
+CUST-106,Gokul,gokul.krishna@example.com,+91 98110 66778,Delhi,Delhi NCR,India,Consumer,STR-005
+CUST-107,Hari,hari.sundaram@example.com,+91 98402 77889,Chennai,Tamil Nadu,India,Corporate,STR-001
+CUST-108,Karthik,karthik.raja@example.com,+91 98803 88990,Bengaluru,Karnataka,India,Consumer,STR-002
+CUST-109,Kavya,kavya.patel@example.com,+91 98491 99001,Hyderabad,Telangana,India,Home Office,STR-003
+CUST-110,Lavanya,lavanya.c@example.com,+91 98492 10112,Hyderabad,Telangana,India,Consumer,STR-003
+CUST-111,Meena,meena.kumari@example.com,+91 98403 21223,Chennai,Tamil Nadu,India,Consumer,STR-001
+CUST-112,Nithya,nithya.menon@example.com,+91 98404 32334,Chennai,Tamil Nadu,India,Corporate,STR-001
+CUST-113,Rahul,rahul.verma@example.com,+91 98202 43445,Mumbai,Maharashtra,India,Consumer,STR-004
+CUST-114,Santhosh,santhosh.n@example.com,+91 98405 54556,Chennai,Tamil Nadu,India,Home Office,STR-001
+CUST-115,Suresh,suresh.kumar@example.com,+91 98804 65667,Bengaluru,Karnataka,India,Consumer,STR-002
+CUST-116,Swetha,swetha.r@example.com,+91 98111 76778,Delhi,Delhi NCR,India,Corporate,STR-005
+CUST-117,Vijay,vijay.anand@example.com,+91 98203 87889,Mumbai,Maharashtra,India,Corporate,STR-004

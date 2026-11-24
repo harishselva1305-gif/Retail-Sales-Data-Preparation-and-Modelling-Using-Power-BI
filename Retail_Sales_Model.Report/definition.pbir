@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../Retail_Sales_Model.Dataset"
+    },
+    "byConnection": null
+  }
+}

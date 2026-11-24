@@ -1,0 +1,11 @@
+ProductID,ProductName,Category,SubCategory,CostPrice,StandardRetailPrice
+PRD-001,Headphones,Mobile & Audio,Audio Accessories,1950.0,2550.0
+PRD-002,Keyboard,Computers & Peripherals,Input Devices,920.0,1220.0
+PRD-003,Laptop,Computers & Peripherals,Computers,42000.0,54000.0
+PRD-004,Monitor,Computers & Peripherals,Displays,7200.0,9400.0
+PRD-005,Mouse,Computers & Peripherals,Input Devices,480.0,650.0
+PRD-006,Printer,Computers & Peripherals,Printers,5800.0,7600.0
+PRD-007,Smartphone,Mobile & Audio,Mobile Phones,14500.0,18800.0
+PRD-008,Tablet,Mobile & Audio,Tablets,17500.0,22500.0
+PRD-009,USB Drive,Computers & Peripherals,Storage,420.0,560.0
+PRD-010,Webcam,Computers & Peripherals,Video Peripherals,1550.0,2050.0

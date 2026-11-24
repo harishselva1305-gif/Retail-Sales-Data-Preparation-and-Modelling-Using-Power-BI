@@ -1,0 +1,120 @@
+// =========================================================================
+// DAX SCRIPT: DATE TABLE & ANALYTICAL MEASURES (3 DASHBOARDS SUITE)
+// Project: Retail Sales Data Preparation and Modelling Using Power BI
+// =========================================================================
+
+// =========================================================================
+// 1. CALCULATED TABLE: DimDate
+// =========================================================================
+DimDate = 
+ADDCOLUMNS (
+    CALENDAR ( DATE(2026, 1, 1), DATE(2026, 12, 31) ),
+    "DateKey", INT(FORMAT([Date], "YYYYMMDD")),
+    "Year", YEAR([Date]),
+    "Month Number", MONTH([Date]),
+    "Month Name", FORMAT([Date], "MMMM"),
+    "Month Short", FORMAT([Date], "MMM"),
+    "Year-Month", FORMAT([Date], "YYYY-MM"),
+    "Quarter", "Q" & FORMAT([Date], "Q"),
+    "Quarter-Year", "Q" & FORMAT([Date], "Q") & " " & FORMAT([Date], "YYYY"),
+    "Day of Month", DAY([Date]),
+    "Day of Week Number", WEEKDAY([Date], 2), -- 1 = Monday, 7 = Sunday
+    "Day of Week", FORMAT([Date], "dddd"),
+    "Day Short", FORMAT([Date], "ddd"),
+    "Is Weekend", IF(WEEKDAY([Date], 2) >= 6, "Weekend", "Weekday")
+)
+
+
+// =========================================================================
+// 2. DASHBOARD 1: SALES OVERVIEW MEASURES (4 CARDS)
+// =========================================================================
+
+// Card 1: Total Sales Revenue
+Total Sales = 
+SUM ( FactSales[Sales Amount] )
+
+// Card 2: Total Distinct Orders
+Total Orders = 
+DISTINCTCOUNT ( FactSales[Sales ID] )
+
+// Card 3: Total Quantity of Hardware Units Sold
+Total Quantity = 
+SUM ( FactSales[Quantity] )
+
+// Card 4: Average Order Value (AOV)
+Average Order Value = 
+DIVIDE ( [Total Sales], [Total Orders], 0 )
+
+
+// =========================================================================
+// 3. DASHBOARD 2: PRODUCT PERFORMANCE MEASURES (5 CARDS)
+// =========================================================================
+
+// Card 1: Total Active Product Catalog
+Total Products = 
+DISTINCTCOUNT ( DimProduct[ProductID] )
+
+// Card 2: Average Unit Selling Price
+Average Unit Price = 
+DIVIDE ( [Total Sales], [Total Quantity], 0 )
+
+// Card 3: Average Units per Order Basket
+Units Per Order = 
+DIVIDE ( [Total Quantity], [Total Orders], 0 )
+
+// Card 4: Cost of Goods Sold (COGS)
+Total Cost = 
+SUMX ( 
+    FactSales, 
+    FactSales[Quantity] * RELATED ( DimProduct[CostPrice] ) 
+)
+
+// Card 5: Gross Product Margin
+Total Profit = 
+[Total Sales] - [Total Cost]
+
+
+// =========================================================================
+// 4. DASHBOARD 3: PROFIT & BUSINESS ANALYSIS MEASURES (5 CARDS)
+// =========================================================================
+
+// Card 1: Total Gross Profit
+// (Uses [Total Profit] from above: ₹298,382.36)
+
+// Card 2: Overall Profit Margin %
+Profit Margin % = 
+DIVIDE ( [Total Profit], [Total Sales], 0 )
+
+// Card 3: Total Cost
+// (Uses [Total Cost] from above: ₹1,068,940.00)
+
+// Card 4: Average Profit Realized Per Order
+Profit Per Order = 
+DIVIDE ( [Total Profit], [Total Orders], 0 )
+
+// Card 5: Return on Investment / Return on Cost (ROI %)
+ROI Return on Cost % = 
+DIVIDE ( [Total Profit], [Total Cost], 0 )
+
+
+// =========================================================================
+// 5. TIME INTELLIGENCE & COMPARATIVE DAX MEASURES
+// =========================================================================
+
+// Sales Year-to-Date (YTD)
+Sales YTD = 
+TOTALYTD ( [Total Sales], DimDate[Date] )
+
+// Prior Month Sales
+Sales Prior Month = 
+CALCULATE (
+    [Total Sales],
+    PREVIOUSMONTH ( DimDate[Date] )
+)
+
+// Month-over-Month Growth %
+MoM Sales Growth % = 
+VAR _Current = [Total Sales]
+VAR _Prior = [Sales Prior Month]
+RETURN
+    DIVIDE ( _Current - _Prior, _Prior, BLANK() )

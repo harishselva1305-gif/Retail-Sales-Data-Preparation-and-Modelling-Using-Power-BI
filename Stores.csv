@@ -1,0 +1,6 @@
+StoreID,StoreName,City,State,Region,StoreType,ManagerName
+STR-001,TechHub Chennai Flagship,Chennai,Tamil Nadu,South,Flagship,Rajesh Sharma
+STR-002,Digital World Bengaluru,Bengaluru,Karnataka,South,Superstore,Priya Nair
+STR-003,CyberMart Express Hyderabad,Hyderabad,Telangana,South,Express Store,Vikram Reddy
+STR-004,SmartRetail Mega Mumbai,Mumbai,Maharashtra,West,Superstore,Neha Mehta
+STR-005,Metro Electronics Delhi,Delhi,Delhi NCR,North,Flagship,Amit Verma
