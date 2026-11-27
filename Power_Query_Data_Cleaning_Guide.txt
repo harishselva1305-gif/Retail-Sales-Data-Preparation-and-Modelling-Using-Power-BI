@@ -1,0 +1,135 @@
+POWER QUERY AND DATA CLEANING - PROJECT GUIDE
+=============================================
+
+Files used:
+- Power_Query_Data_Cleaning_Project.xlsx (Raw_Sales, Customers, Raw_Quarterly, Sales_H1, Sales_H2 + expected outputs)
+- sales_raw.csv (messy source data)
+
+Problems in the raw data: blank rows, blank / "N/A" Qty, blank Product, duplicate Order IDs,
+extra spaces, mixed upper/lower case, mixed date formats, numbers stored as text.
+
+
+1. IMPORTING DATA FROM CSV, EXCEL AND THE WEB
+---------------------------------------------
+CSV   : Data > Get Data > From File > From Text/CSV
+Excel : Data > Get Data > From File > From Workbook (or select range > Data > From Table/Range)
+Web   : Data > Get Data > From Other Sources > From Web (paste URL)
+
+M code:
+  Csv.Document(File.Contents("C:\PQ\sales_raw.csv"),[Delimiter=",",Encoding=65001])
+  Excel.Workbook(File.Contents("C:\PQ\book.xlsx"),null,true)
+  Web.Page(Web.Contents("https://example.com/table"))
+
+
+2. POWER QUERY EDITOR INTERFACE
+-------------------------------
+- Ribbon: Home, Transform, Add Column, View
+- Queries pane (left): list of all queries
+- Data preview (centre): sample of the data
+- Query Settings (right): Name + Applied Steps (each step can be edited or deleted)
+- Formula bar: View > Formula Bar (shows the M code of the selected step)
+- Advanced Editor: Home > Advanced Editor (full M code)
+
+
+3. REMOVING BLANKS, ERRORS AND DUPLICATES
+-----------------------------------------
+a) Blank rows   : Home > Remove Rows > Remove Blank Rows
+b) Errors       : Change Qty to Whole Number first ("N/A" becomes Error),
+                  then Home > Remove Rows > Remove Errors
+c) Blank values : Filter the column and untick (null) / (blank)
+d) Duplicates   : Select Order ID > Home > Remove Rows > Remove Duplicates
+e) Trim/Clean   : Transform > Format > Trim, then Capitalize Each Word
+
+M code:
+  Table.SelectRows(Promoted, each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_),{"",null})))
+  Table.RemoveRowsWithErrors(Typed,{"Order Date","Qty"})
+  Table.SelectRows(Prev, each [Qty] <> null and [Product] <> "")
+  Table.Distinct(Prev,{"Order ID"})
+  Table.TransformColumns(Prev,{{"Customer Full Name",each Text.Proper(Text.Trim(_)),type text}})
+
+
+4. SPLITTING AND MERGING COLUMNS
+--------------------------------
+Split : Select Customer Full Name > Transform > Split Column > By Delimiter > Space > Left-most delimiter
+        Rename to First Name / Last Name
+Merge : Select First Name + Last Name > Transform > Merge Columns > Separator: Space > "Customer Name"
+
+M code:
+  Table.SplitColumn(Prev,"Customer Full Name",Splitter.SplitTextByEachDelimiter({" "},QuoteStyle.Csv,false),{"First Name","Last Name"})
+  Table.CombineColumns(Prev,{"First Name","Last Name"},Combiner.CombineTextByDelimiter(" ",QuoteStyle.None),"Customer Name")
+
+
+5. CHANGING DATA TYPES
+----------------------
+Click the type icon in the column header (or Transform > Data Type).
+- Order Date -> Date (use "Using Locale" for dd/mm/yyyy)
+- Qty, Unit Price -> Whole Number
+
+M code:
+  Table.TransformColumnTypes(Prev,{{"Order Date",type date},{"Qty",Int64.Type},{"Unit Price",Int64.Type}},"en-IN")
+
+
+6. UNPIVOTING DATA
+------------------
+Load Raw_Quarterly (Product | Q1 | Q2 | Q3 | Q4)
+Select Product > Transform > Unpivot Columns > Unpivot Other Columns
+Rename Attribute -> Quarter, Value -> Sales
+
+M code:
+  Table.UnpivotOtherColumns(Prev,{"Product"},"Quarter","Sales")
+
+
+7. MERGING AND APPENDING QUERIES
+--------------------------------
+Merge  : Home > Merge Queries > Clean_Sales + Customers > match on Customer Name >
+         Join Kind: Left Outer > expand City and Segment
+Append : Home > Append Queries > Append Queries as New > Sales_H1 + Sales_H2
+         (column names must match)
+
+M code:
+  Table.NestedJoin(Sales,{"Customer Name"},Customers,{"Customer Name"},"Cust",JoinKind.LeftOuter)
+  Table.ExpandTableColumn(Joined,"Cust",{"City","Segment"})
+  Table.Combine({Sales_H1,Sales_H2})
+
+
+8. BASIC DATA CLEANING WORKFLOW
+-------------------------------
+ 1. Import data
+ 2. Promote headers
+ 3. Trim / clean text, fix case
+ 4. Change data types
+ 5. Remove blank rows
+ 6. Remove errors
+ 7. Remove duplicates
+ 8. Split / merge columns
+ 9. Merge / append other queries
+10. Rename steps and columns
+11. Close & Load
+
+Tip: change types BEFORE removing errors; trim text BEFORE removing duplicates.
+
+
+9. LOADING CLEANED DATA TO EXCEL
+--------------------------------
+Home > Close & Load            -> table on a new sheet
+Home > Close & Load To...      -> Table / Only Create Connection / Data Model
+Refresh later: Data > Refresh All (Ctrl+Alt+F5)
+
+
+FULL QUERY (Clean_Sales)
+------------------------
+let
+  Source = Csv.Document(File.Contents("C:\PQ\sales_raw.csv"),[Delimiter=",",Encoding=65001]),
+  Promoted = Table.PromoteHeaders(Source,[PromoteAllScalars=true]),
+  NoBlankRows = Table.SelectRows(Promoted, each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_),{"",null}))),
+  Cleaned = Table.TransformColumns(NoBlankRows,{{"Customer Full Name",each Text.Proper(Text.Trim(_)),type text},{"Region",each Text.Proper(Text.Trim(_)),type text},{"Product",each Text.Trim(_),type text}}),
+  Typed = Table.TransformColumnTypes(Cleaned,{{"Order Date",type date},{"Qty",Int64.Type},{"Unit Price",Int64.Type}},"en-IN"),
+  NoErrors = Table.RemoveRowsWithErrors(Typed,{"Order Date","Qty"}),
+  NoBlanks = Table.SelectRows(NoErrors, each [Qty] <> null and [Product] <> ""),
+  NoDups = Table.Distinct(NoBlanks,{"Order ID"}),
+  Split = Table.SplitColumn(NoDups,"Customer Full Name",Splitter.SplitTextByEachDelimiter({" "},QuoteStyle.Csv,false),{"First Name","Last Name"}),
+  Merged = Table.AddColumn(Split,"Customer Name",each [First Name]&" "&[Last Name],type text),
+  Joined = Table.NestedJoin(Merged,{"Customer Name"},Customers,{"Customer Name"},"Cust",JoinKind.LeftOuter),
+  Final = Table.ExpandTableColumn(Joined,"Cust",{"City","Segment"})
+in
+  Final
